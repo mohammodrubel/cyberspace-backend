@@ -1,0 +1,180 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id           String               @id
+  sku          String               @unique
+  brand        String?
+  category     String
+  imageUrl     String?
+  price        Decimal?             @db.Decimal(12, 2)
+  currency     String?
+  stock        Int?
+  syncedAt     DateTime
+  translations ProductTranslation[]
+  inquiries    Inquiry[]
+
+  @@index([category])
+  @@index([syncedAt])
+}
+
+model ProductTranslation {
+  id          Int     @id @default(autoincrement())
+  productId   String
+  lang        Lang
+  name        String
+  description String?
+  product     Product @relation(fields: [productId], references: [id])
+
+  @@unique([productId, lang])
+}
+
+model Inquiry {
+  id            Int           @id @default(autoincrement())
+  productId     String
+  name          String
+  phone         String
+  message       String?
+  status        InquiryStatus @default(NEW)
+  assignedTo    Int?
+  submittedById Int?
+  createdAt     DateTime      @default(now())
+  product       Product       @relation(fields: [productId], references: [id])
+  submittedBy   User?         @relation("SubmittedInquiries", fields: [submittedById], references: [id])
+
+  @@index([status])
+  @@index([createdAt])
+  @@index([productId])
+}
+
+model Setting {
+  key   String  @id
+  value Boolean
+}
+
+model User {
+  id                 Int       @id @default(autoincrement())
+  email              String    @unique
+  password           String
+  name               String?
+  role               Role      @default(SALES)
+  isActive           Boolean   @default(true)
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  submittedInquiries Inquiry[] @relation("SubmittedInquiries")
+}
+
+enum Lang {
+  AZ
+  EN
+  RU
+}
+
+enum InquiryStatus {
+  NEW
+  IN_PROGRESS
+  DONE
+}
+
+enum Role {
+  ADMIN
+  SALES
+}
+
+model Banner {
+  id         Int      @id @default(autoincrement())
+  titleAZ    String
+  titleEN    String
+  titleRU    String
+  subtitleAZ String?
+  subtitleEN String?
+  subtitleRU String?
+  descAZ     String?
+  descEN     String?
+  descRU     String?
+  ctaText    String?
+  ctaUrl     String?
+  ctaText2   String?
+  ctaUrl2    String?
+  imageUrl   String?
+  isActive   Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model Partner {
+  id         Int      @id @default(autoincrement())
+  name       String
+  logoUrl    String?
+  websiteUrl String?
+  descAZ     String?
+  descEN     String?
+  descRU     String?
+  isActive   Boolean  @default(true)
+  order      Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model News {
+  id           Int               @id @default(autoincrement())
+  slug         String            @unique
+  imageUrl     String?
+  authorName   String            @default("Cyberspace Team")
+  publishedAt  DateTime?
+  status       NewsStatus        @default(DRAFT)
+  order        Int               @default(0)
+  createdAt    DateTime          @default(now())
+  updatedAt    DateTime          @updatedAt
+  translations NewsTranslation[]
+
+  @@index([status])
+  @@index([publishedAt])
+}
+
+model NewsTranslation {
+  id       Int    @id @default(autoincrement())
+  newsId   Int
+  lang     Lang
+  title    String
+  category String
+  excerpt  String
+  body     String @db.Text
+  news     News   @relation(fields: [newsId], references: [id], onDelete: Cascade)
+
+  @@unique([newsId, lang])
+}
+
+model HomeContent {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int      @id @default(autoincrement())
+  slug      String   @unique
+  nameAZ    String
+  nameEN    String
+  nameRU    String
+  imageUrl  String?
+  isActive  Boolean  @default(true)
+  order     Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([isActive])
+  @@index([order])
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+}
