@@ -7,7 +7,6 @@ import { settingRouter } from '../modules/setting/setting.route';
 import { bannerRouter } from '../modules/banner/banner.route';
 import { partnerRouter } from '../modules/partner/partner.route';
 import { newsRouter } from '../modules/news/news.route';
-import { homeContentRouter } from '../modules/homeContent/homeContent.route';
 import { uploadRouter } from '../modules/upload/upload.route';
 import { categoryRouter } from '../modules/category/category.route';
 
@@ -24,7 +23,6 @@ const routes: Route[] = [
   { path: '/banners', route: bannerRouter },
   { path: '/partners', route: partnerRouter },
   { path: '/news', route: newsRouter },
-  { path: '/home-content', route: homeContentRouter },
   { path: '/upload', route: uploadRouter },
   { path: '/categories', route: categoryRouter },
 ];

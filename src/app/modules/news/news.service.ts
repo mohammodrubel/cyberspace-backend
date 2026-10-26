@@ -6,7 +6,6 @@ import { Lang } from '@prisma/client';
 interface INewsTranslation {
   lang: Lang;
   title: string;
-  category: string;
   excerpt: string;
   body: string;
 }
